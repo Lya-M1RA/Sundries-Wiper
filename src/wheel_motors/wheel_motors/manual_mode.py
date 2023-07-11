@@ -69,7 +69,7 @@ class ManualMode(Node):
         # sleep(self.sleep_time)
 
     def esc_motor_velocity(self, left_target, right_target):
-        self.rs485_1.execute(1, cst.WRITE_MULTIPLE_REGISTERS, int(0x2088), output_value=[left_target, -right_target])
+        self.rs485_1.execute(1, cst.WRITE_MULTIPLE_REGISTERS, int(0x2088), output_value=[-left_target, right_target])
         # sleep(self.sleep_time)
 
             
