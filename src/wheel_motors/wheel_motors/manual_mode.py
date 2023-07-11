@@ -21,8 +21,8 @@ class ManualMode(Node):
     state_enable = [False, 0, 0]  # [state_enable, previous_button_pressed, button_pressed]
     state_emerge = 0
 
-    max_torque = 2000
-    twist_ratio = 0.25
+    max_speed = 25
+    twist_ratio = 0.5
 
     sleep_time = 0.02
 
@@ -46,28 +46,31 @@ class ManualMode(Node):
         
     def esc_clear_alarm(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=6)
-        sleep(self.sleep_time)
+        # sleep(self.sleep_time)
 
     def esc_emergency_stop(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=5)
-        sleep(self.sleep_time)
+        # sleep(self.sleep_time)
 
     def esc_enable(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=8)
-        sleep(self.sleep_time)
+        # sleep(self.sleep_time)
 
     def esc_disable(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=7)
-        sleep(self.sleep_time)
+        # sleep(self.sleep_time)
 
     def esc_torque_control(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200d), output_value=4)
-        sleep(self.sleep_time)
+        # sleep(self.sleep_time)
 
-    def esc_motor_torque(self, left_target, right_target):
-        self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2090), output_value=left_target)
-        self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2091), output_value=right_target)
-        sleep(self.sleep_time)
+    def esc_velocity_control(self):
+        self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200d), output_value=3)
+        # sleep(self.sleep_time)
+
+    def esc_motor_velocity(self, left_target, right_target):
+        self.rs485_1.execute(1, cst.WRITE_MULTIPLE_REGISTERS, int(0x2088), output_value=[left_target, -right_target])
+        # sleep(self.sleep_time)
 
             
 
@@ -107,18 +110,18 @@ class ManualMode(Node):
             self.state_enable[0] = not self.state_enable[0]
             if self.state_enable[0] == True:
                 self.esc_clear_alarm()
-                self.esc_torque_control()
+                self.esc_velocity_control()
                 self.esc_enable()
                 self.get_logger().info("Motors Enabled")
             else:
                 self.esc_clear_alarm()
-                self.esc_torque_control()
+                self.esc_velocity_control()
                 self.esc_disable()
                 self.get_logger().info("Motors Disabled")
 
         if self.state_enable[0] == True:
-            self.left_motor_param = int(self.max_torque * (self.motors_y + self.motors_x * self.twist_ratio))
-            self.right_motor_param = int(self.max_torque * (self.motors_y - self.motors_x * self.twist_ratio))
+            self.left_motor_param = int(self.max_speed * (self.motors_y + self.motors_x * self.twist_ratio))
+            self.right_motor_param = int(self.max_speed * (self.motors_y - self.motors_x * self.twist_ratio))
 
             self.esc_motor_torque(self.left_motor_param, self.right_motor_param)
             self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
