@@ -61,7 +61,8 @@ class ManualMode(Node):
         sleep(0.01)
 
     def esc_motor_torque(self, left_target, right_target):
-        self.rs485_1.execute(1, cst.WRITE_MULTIPLE_REGISTERS, int(0x2090), output_value=[left_target, right_target])
+        self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2090), output_value=left_target)
+        self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2091), output_value=right_target)
         sleep(0.01)
 
             
