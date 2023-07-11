@@ -22,7 +22,7 @@ class ManualMode(Node):
     state_enable = [False, 0, 0]  # [state_enable, previous_button_pressed, button_pressed]
     state_emerge = 0
 
-    max_torque = 1000.0
+    max_torque = 2000.0
     twist_ratio = 0.25
 
 
@@ -30,7 +30,6 @@ class ManualMode(Node):
         super().__init__(name)
 
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1))
-        self.rs485_1.set_timeout(0.05)
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_torque_control()
