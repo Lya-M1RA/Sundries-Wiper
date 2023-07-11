@@ -24,12 +24,16 @@ class ManualMode(Node):
     max_torque = 2000
     twist_ratio = 0.25
 
+    sleep_time = 0.02
+
 
     def __init__(self,name):
         super().__init__(name)
 
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1, xonxoff=0))
+        self.rs485_1.set_timeout(0.5)
         self.rs485_1.set_verbose(True)
+        sleep(1)
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_torque_control()
@@ -42,28 +46,28 @@ class ManualMode(Node):
         
     def esc_clear_alarm(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=6)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
     def esc_emergency_stop(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=5)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
     def esc_enable(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=8)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
     def esc_disable(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200e), output_value=7)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
     def esc_torque_control(self):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x200d), output_value=4)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
     def esc_motor_torque(self, left_target, right_target):
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2090), output_value=left_target)
         self.rs485_1.execute(1, cst.WRITE_SINGLE_REGISTER, int(0x2091), output_value=right_target)
-        sleep(0.01)
+        sleep(self.sleep_time)
 
             
 
