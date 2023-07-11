@@ -1,5 +1,3 @@
-from re import T
-from time import sleep
 import rclpy                                     # ROS2 Python Client Library
 from rclpy.node import Node                      # ROS2 Node
 from sensor_msgs.msg import Joy                  # ROS2 standard Joy Message
@@ -22,7 +20,7 @@ class ManualMode(Node):
     state_enable = [False, 0, 0]  # [state_enable, previous_button_pressed, button_pressed]
     state_emerge = 0
 
-    max_torque = 2000.0
+    max_torque = 2000
     twist_ratio = 0.25
 
 
@@ -98,16 +96,20 @@ class ManualMode(Node):
                 self.esc_clear_alarm()
                 self.esc_torque_control()
                 self.esc_enable()
+                self.get_logger().info("Motors Enabled")
             else:
                 self.esc_clear_alarm()
                 self.esc_torque_control()
                 self.esc_disable()
+                self.get_logger().info("Motors Disabled")
 
         if self.state_enable[0] == True:
             self.left_motor_param = int(self.max_torque * (self.motors_y + self.motors_x * self.twist_ratio))
             self.right_motor_param = int(self.max_torque * (self.motors_y - self.motors_x * self.twist_ratio))
 
             self.esc_motor_torque(self.left_motor_param, self.right_motor_param)
+            self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
+
 
 def main(args=None):
     rclpy.init(args=args)
