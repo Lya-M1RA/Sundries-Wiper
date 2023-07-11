@@ -20,6 +20,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
+            'manual_mode = wheel_motors.manual_mode:main',
         ],
     },
 )
