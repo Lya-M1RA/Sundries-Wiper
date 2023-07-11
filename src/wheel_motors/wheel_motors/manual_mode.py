@@ -36,7 +36,7 @@ class ManualMode(Node):
         sleep(1)
         self.esc_clear_alarm()
         self.esc_disable()
-        self.esc_torque_control()
+        self.esc_velocity_control()
 
         self.sub_joy = self.create_subscription(
             Joy, 
@@ -123,7 +123,7 @@ class ManualMode(Node):
             self.left_motor_param = int(self.max_speed * (self.motors_y + self.motors_x * self.twist_ratio))
             self.right_motor_param = int(self.max_speed * (self.motors_y - self.motors_x * self.twist_ratio))
 
-            self.esc_motor_torque(self.left_motor_param, self.right_motor_param)
+            self.esc_motor_velocity(self.left_motor_param, self.right_motor_param)
             self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
 
 
