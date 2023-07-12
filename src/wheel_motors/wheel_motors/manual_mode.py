@@ -128,6 +128,7 @@ class ManualMode(Node):
         self.state_emerge = input['left_shoulder_button']
         if self.state_emerge == 1:
             self.esc_emergency_stop()
+            self.state_enable[0] = False
             play(self.emergency)
             self.get_logger().info("Emergency Stop")
         else:
@@ -169,13 +170,14 @@ class ManualMode(Node):
 
             if input['y_button'] == 1:
                 GPIO.output(self.air_pump, GPIO.HIGH)
-                sleep(2)
+                sleep(4)
                 GPIO.output(self.air_pump, GPIO.LOW)
 
             if input['x_button'] == 1:
                 GPIO.output(self.air_valve, GPIO.HIGH)
-                sleep(1)
+                sleep(10)
                 GPIO.output(self.air_valve, GPIO.LOW)
+
 
 
 def main(args=None):
