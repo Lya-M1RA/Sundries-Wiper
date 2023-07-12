@@ -10,6 +10,7 @@ from modbus_tk import modbus_rtu
 from pydub import AudioSegment
 from pydub.playback import play
 import can
+import RPi.GPIO as GPIO
 
 
 
@@ -31,6 +32,9 @@ class ManualMode(Node):
 
     sleep_time = 0.02
 
+    air_pump = 22
+    air_valve = 23
+    ac_input = 27
 
     def __init__(self,name):
         super().__init__(name)
@@ -43,6 +47,11 @@ class ManualMode(Node):
         self.fence = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Fence.mp3', format='mp3')
         self.stairs = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Stairs.mp3', format='mp3')
 
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(self.air_pump, GPIO.OUT)
+        GPIO.setup(self.air_valve, GPIO.OUT)
+        GPIO.setup(self.ac_input, GPIO.IN)
+
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1, xonxoff=0))
         self.rs485_1.set_timeout(0.5)
         self.rs485_1.set_verbose(True)
@@ -50,6 +59,9 @@ class ManualMode(Node):
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_velocity_control()
+
+        self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
+
         play(self.initialized)
 
         self.sub_joy = self.create_subscription(
@@ -154,6 +166,16 @@ class ManualMode(Node):
 
             if input['a_button'] == 1:
                 play(self.hillside)
+
+            if input['y_button'] == 1:
+                GPIO.output(self.air_pump, GPIO.HIGH)
+                sleep(2)
+                GPIO.output(self.air_pump, GPIO.LOW)
+
+            if input['x_button'] == 1:
+                GPIO.output(self.air_valve, GPIO.HIGH)
+                sleep(1)
+                GPIO.output(self.air_valve, GPIO.LOW)
 
 
 def main(args=None):
