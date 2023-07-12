@@ -6,6 +6,9 @@ import serial
 import modbus_tk
 import modbus_tk.defines as cst
 from modbus_tk import modbus_rtu
+from pydub import AudioSegment
+from pydub.playback import play
+
 
 
 class ManualMode(Node):
@@ -29,6 +32,14 @@ class ManualMode(Node):
 
     def __init__(self,name):
         super().__init__(name)
+        self.hillside = AudioSegment.from_file('./hillside.mp3', format='mp3')
+        self.initialized = AudioSegment.from_file('./Initialized.mp3', format='mp3')
+        self.enabled = AudioSegment.from_file('./Enabled.mp3', format='mp3')
+        self.disabled = AudioSegment.from_file('./Disabled.mp3', format='mp3')
+        self.emergency = AudioSegment.from_file('./EmergencyStop.mp3', format='mp3')
+        self.stopped = AudioSegment.from_file('./Stopped.mp3', format='mp3')
+        self.fence = AudioSegment.from_file('./Fence.mp3', format='mp3')
+        self.stairs = AudioSegment.from_file('./Stairs.mp3', format='mp3')
 
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1, xonxoff=0))
         self.rs485_1.set_timeout(0.5)
@@ -37,6 +48,7 @@ class ManualMode(Node):
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_velocity_control()
+        play(self.initialized)
 
         self.sub_joy = self.create_subscription(
             Joy, 
@@ -100,31 +112,46 @@ class ManualMode(Node):
 
     def input_processor(self,input):
         self.state_emerge = input['left_shoulder_button']
+        if self.state_emerge == 1:
+            self.esc_emergency_stop()
+            play(self.emergency)
+            self.get_logger().info("Emergency Stop")
+        else:
+            self.state_enable[1] = self.state_enable[2]
+            self.state_enable[2] = input['right_shoulder_button']
+            self.motors_x = input['left_joy_x']
+            self.motors_y = input['left_joy_y']
 
-        self.state_enable[1] = self.state_enable[2]
-        self.state_enable[2] = input['right_shoulder_button']
-        self.motors_x = input['left_joy_x']
-        self.motors_y = input['left_joy_y']
+            if self.state_enable[1] == 0 and self.state_enable[2] == 1:
+                self.state_enable[0] = not self.state_enable[0]
+                if self.state_enable[0] == True:
+                    self.esc_clear_alarm()
+                    self.esc_velocity_control()
+                    self.esc_enable()
+                    self.get_logger().info("Motors Enabled")
+                    play(self.enabled)
+                else:
+                    self.esc_clear_alarm()
+                    self.esc_velocity_control()
+                    self.esc_disable()
+                    self.get_logger().info("Motors Disabled")
+                    play(self.disabled)
 
-        if self.state_enable[1] == 0 and self.state_enable[2] == 1:
-            self.state_enable[0] = not self.state_enable[0]
             if self.state_enable[0] == True:
-                self.esc_clear_alarm()
-                self.esc_velocity_control()
-                self.esc_enable()
-                self.get_logger().info("Motors Enabled")
-            else:
-                self.esc_clear_alarm()
-                self.esc_velocity_control()
-                self.esc_disable()
-                self.get_logger().info("Motors Disabled")
+                self.left_motor_param = int(self.max_speed * (self.motors_y + self.motors_x * self.twist_ratio))
+                self.right_motor_param = int(self.max_speed * (self.motors_y - self.motors_x * self.twist_ratio))
 
-        if self.state_enable[0] == True:
-            self.left_motor_param = int(self.max_speed * (self.motors_y + self.motors_x * self.twist_ratio))
-            self.right_motor_param = int(self.max_speed * (self.motors_y - self.motors_x * self.twist_ratio))
+                self.esc_motor_velocity(self.left_motor_param, self.right_motor_param)
+                self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
 
-            self.esc_motor_velocity(self.left_motor_param, self.right_motor_param)
-            self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
+            if self.input['left_shoulder_button_2'] == 1:
+                play(self.fence)
+
+            if self.input['right_shoulder_button_2'] == 1:
+                play(self.stairs)
+
+            if self.input['a_button'] == 1:
+                play(self.hillside)
 
 
 def main(args=None):
