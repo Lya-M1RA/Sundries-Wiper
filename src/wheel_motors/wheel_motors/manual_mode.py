@@ -1,4 +1,5 @@
 from time import sleep
+import os
 import rclpy                                     # ROS2 Python Client Library
 from rclpy.node import Node                      # ROS2 Node
 from sensor_msgs.msg import Joy                  # ROS2 standard Joy Message
@@ -9,6 +10,7 @@ from modbus_tk import modbus_rtu
 from pydub import AudioSegment
 from pydub.playback import play
 import can
+from ament_index_python.packages import get_package_share_directory
 
 
 
@@ -33,7 +35,7 @@ class ManualMode(Node):
 
     def __init__(self,name):
         super().__init__(name)
-        self.hillside = AudioSegment.from_file('./hillside.mp3', format='mp3')
+        self.hillside = AudioSegment.from_file(os.path.join(get_package_share_directory('wheel_motors'), 'audio', 'hillside.mp3'), format='mp3')
         self.initialized = AudioSegment.from_file('./Initialized.mp3', format='mp3')
         self.enabled = AudioSegment.from_file('./Enabled.mp3', format='mp3')
         self.disabled = AudioSegment.from_file('./Disabled.mp3', format='mp3')
