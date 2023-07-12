@@ -146,13 +146,13 @@ class ManualMode(Node):
                 self.esc_motor_velocity(self.left_motor_param, self.right_motor_param)
                 self.get_logger().info("Left Motor: %d, Right Motor: %d" % (self.left_motor_param, self.right_motor_param))
 
-            if self.input['left_shoulder_button_2'] == 1:
+            if input['left_shoulder_button_2'] == 1:
                 play(self.fence)
 
-            if self.input['right_shoulder_button_2'] == 1:
+            if input['right_shoulder_button_2'] == 1:
                 play(self.stairs)
 
-            if self.input['a_button'] == 1:
+            if input['a_button'] == 1:
                 play(self.hillside)
 
 
