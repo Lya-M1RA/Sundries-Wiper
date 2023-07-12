@@ -27,7 +27,7 @@ class ManualMode(Node):
     state_enable = [False, 0, 0]  # [state_enable, previous_button_pressed, button_pressed]
     state_emerge = 0
 
-    max_speed = 30
+    max_speed = 50
     twist_ratio = 0.5
 
     sleep_time = 0.02
