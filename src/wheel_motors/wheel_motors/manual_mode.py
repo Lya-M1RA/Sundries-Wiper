@@ -10,7 +10,6 @@ from modbus_tk import modbus_rtu
 from pydub import AudioSegment
 from pydub.playback import play
 import can
-from ament_index_python.packages import get_package_share_directory
 
 
 
@@ -35,14 +34,14 @@ class ManualMode(Node):
 
     def __init__(self,name):
         super().__init__(name)
-        self.hillside = AudioSegment.from_file(os.path.join(get_package_share_directory('wheel_motors'), 'audio', 'hillside.mp3'), format='mp3')
-        self.initialized = AudioSegment.from_file('./Initialized.mp3', format='mp3')
-        self.enabled = AudioSegment.from_file('./Enabled.mp3', format='mp3')
-        self.disabled = AudioSegment.from_file('./Disabled.mp3', format='mp3')
-        self.emergency = AudioSegment.from_file('./EmergencyStop.mp3', format='mp3')
-        self.stopped = AudioSegment.from_file('./Stopped.mp3', format='mp3')
-        self.fence = AudioSegment.from_file('./Fence.mp3', format='mp3')
-        self.stairs = AudioSegment.from_file('./Stairs.mp3', format='mp3')
+        self.hillside = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/hillside.mp3', format='mp3')
+        self.initialized = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Initialized.mp3', format='mp3')
+        self.enabled = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Enabled.mp3', format='mp3')
+        self.disabled = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Disabled.mp3', format='mp3')
+        self.emergency = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/EmergencyStop.mp3', format='mp3')
+        self.stopped = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Stopped.mp3', format='mp3')
+        self.fence = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Fence.mp3', format='mp3')
+        self.stairs = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Stairs.mp3', format='mp3')
 
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1, xonxoff=0))
         self.rs485_1.set_timeout(0.5)
@@ -138,7 +137,7 @@ class ManualMode(Node):
                     self.esc_velocity_control()
                     self.esc_disable()
                     self.get_logger().info("Motors Disabled")
-                    play(self.disabled)
+                    play(self.stopped)
 
             if self.state_enable[0] == True:
                 self.left_motor_param = int(self.max_speed * (self.motors_y + self.motors_x * self.twist_ratio))
