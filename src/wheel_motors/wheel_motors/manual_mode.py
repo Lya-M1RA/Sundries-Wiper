@@ -38,6 +38,8 @@ class ManualMode(Node):
 
     axis_state = [0, 0]
 
+    valve_state = [False, 0, 0]
+
     def __init__(self,name):
         super().__init__(name)
         self.hillside = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/hillside.mp3', format='mp3')
@@ -184,12 +186,16 @@ class ManualMode(Node):
 
             if input['y_button'] == 1:
                 GPIO.output(self.air_pump, GPIO.HIGH)
-                sleep(4)
+            else:
                 GPIO.output(self.air_pump, GPIO.LOW)
 
-            if input['x_button'] == 1:
+            self.valve_state[1] = self.valve_state[2]
+            self.valve_state[2] = input['x_button']
+            if self.valve_state[1] == 0 and self.valve_state[2] == 1:
+                self.valve_state[0] = not self.valve_state[0]
+            if self.valve_state[0] == True:
                 GPIO.output(self.air_valve, GPIO.HIGH)
-                sleep(10)
+            else:
                 GPIO.output(self.air_valve, GPIO.LOW)
 
 
