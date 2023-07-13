@@ -66,7 +66,7 @@ class ManualMode(Node):
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_velocity_control()
-        self.get_logger().info("ESC initialized.")q
+        self.get_logger().info("ESC initialized.")
 
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
         self.platform_raise = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x0f, 0xa0, 0x00, 0x6b], is_extended_id=True)
@@ -74,7 +74,7 @@ class ManualMode(Node):
         self.platform_stop = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x00, 0x6b], is_extended_id=True)
         self.get_logger().info("CAN initialized.")
 
-        self.arduino = serial.Serial('/dev/ttyArduino', 9600, timeout=0.1)
+        self.arduino = serial.Serial('/dev/ttyUSB2', 9600, timeout=0.1)
         self.get_logger().info("Arduino initialized.")
 
         play(self.initialized)
