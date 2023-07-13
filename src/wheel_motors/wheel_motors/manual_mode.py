@@ -207,13 +207,13 @@ class ManualMode(Node):
                 GPIO.output(self.air_valve, GPIO.LOW)
 
             if input['dpad_x'] == -1:
-                self.arduino.write(1)
+                self.arduino.write("1\n")
             if input['dpad_x'] == 1:
-                self.arduino.write(2)
+                self.arduino.write("2\n")
             if input['select_button'] == 0:
-                self.arduino.write(3)
+                self.arduino.write("3\n")
             if input['start_button'] == 0:
-                self.arduino.write(4)
+                self.arduino.write("4\n")
 
 
 def main(args=None):
