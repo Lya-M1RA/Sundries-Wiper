@@ -63,8 +63,8 @@ class ManualMode(Node):
         self.esc_velocity_control()
 
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
-        self.platform_raise = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x07, 0xd8, 0x00, 0x6b], is_extended_id=True)
-        self.platform_lower = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x01, 0x03, 0xe8, 0x07, 0xd8, 0x00, 0x6b], is_extended_id=True)
+        self.platform_raise = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x0f, 0xa0, 0x00, 0x6b], is_extended_id=True)
+        self.platform_lower = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x01, 0x03, 0xe8, 0x0f, 0xa0, 0x00, 0x6b], is_extended_id=True)
         self.platform_stop = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x00, 0x6b], is_extended_id=True)
 
         play(self.initialized)
