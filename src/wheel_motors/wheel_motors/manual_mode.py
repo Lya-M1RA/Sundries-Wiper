@@ -27,7 +27,7 @@ class ManualMode(Node):
     state_enable = [False, 0, 0]  # [state_enable, previous_button_pressed, button_pressed]
     state_emerge = 0
 
-    max_speed = 50
+    max_speed = 30
     twist_ratio = 0.5
 
     sleep_time = 0.02
@@ -50,24 +50,32 @@ class ManualMode(Node):
         self.stopped = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Stopped.mp3', format='mp3')
         self.fence = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Fence.mp3', format='mp3')
         self.stairs = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/Stairs.mp3', format='mp3')
+        self.get_logger().info("Audio loaded.")
 
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.air_pump, GPIO.OUT)
         GPIO.setup(self.air_valve, GPIO.OUT)
         GPIO.setup(self.ac_input, GPIO.IN)
+        self.get_logger().info("Air pump and valve initialized.")
 
         self.rs485_1 = modbus_rtu.RtuMaster(serial.Serial(port="/dev/ttySC0", baudrate=115200, bytesize=8, parity='N', stopbits=1, xonxoff=0))
         self.rs485_1.set_timeout(0.5)
         self.rs485_1.set_verbose(True)
+        self.get_logger().info("RS485-1 initialized.")
         sleep(1)
         self.esc_clear_alarm()
         self.esc_disable()
         self.esc_velocity_control()
+        self.get_logger().info("ESC initialized.")q
 
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
         self.platform_raise = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x0f, 0xa0, 0x00, 0x6b], is_extended_id=True)
         self.platform_lower = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x01, 0x03, 0xe8, 0x0f, 0xa0, 0x00, 0x6b], is_extended_id=True)
         self.platform_stop = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x00, 0x6b], is_extended_id=True)
+        self.get_logger().info("CAN initialized.")
+
+        self.arduino = serial.Serial('/dev/ttyArduino', 9600, timeout=0.1)
+        self.get_logger().info("Arduino initialized.")
 
         play(self.initialized)
 
@@ -198,6 +206,14 @@ class ManualMode(Node):
             else:
                 GPIO.output(self.air_valve, GPIO.LOW)
 
+            if input['dpad_x'] == -1:
+                self.arduino.write(1)
+            if input['dpad_x'] == 1:
+                self.arduino.write(2)
+            if input['select_button'] == 0:
+                self.arduino.write(3)
+            if input['start_button'] == 0:
+                self.arduino.write(4)
 
 
 def main(args=None):
