@@ -36,6 +36,8 @@ class ManualMode(Node):
     air_valve = 23
     ac_input = 27
 
+    axis_state = [0, 0]
+
     def __init__(self,name):
         super().__init__(name)
         self.hillside = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/hillside.mp3', format='mp3')
@@ -61,6 +63,9 @@ class ManualMode(Node):
         self.esc_velocity_control()
 
         self.can0 = can.interface.Bus(channel = 'can0', bustype = 'socketcan')
+        self.platform_raise = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x03, 0xe8, 0x00, 0x6b], is_extended_id=True)
+        self.platform_lower = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x01, 0x03, 0xe8, 0x03, 0xe8, 0x00, 0x6b], is_extended_id=True)
+        self.platform_stop = can.Message(arbitration_id=0x00000100, data=[0xf6, 0x00, 0x03, 0xe8, 0x00, 0x00, 0x00, 0x6b], is_extended_id=True)
 
         play(self.initialized)
 
@@ -125,6 +130,15 @@ class ManualMode(Node):
         self.input_processor(input)
 
     def input_processor(self,input):
+        self.axis_state[0] = self.axis_state[1]
+        self.axis_state[1] = input['dpad_y']
+        if self.axis_state[0] == 0 and self.axis_state[1] == 1:
+            self.can0.send(self.platform_raise)
+        if self.axis_state[0] == 0 and self.axis_state[1] == -1:
+            self.can0.send(self.platform_lower)
+        if abs(self.axis_state[0]) == 1 and self.axis_state[1] == 0:
+            self.can0.send(self.platform_stop)
+
         self.state_emerge = input['left_shoulder_button']
         if self.state_emerge == 1:
             self.esc_emergency_stop()
