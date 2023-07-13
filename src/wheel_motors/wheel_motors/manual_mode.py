@@ -40,6 +40,11 @@ class ManualMode(Node):
 
     valve_state = [False, 0, 0]
 
+    arm_enable = "1\n"
+    arm_disable = "2\n"
+    arm_down = "3\n"
+    arm_up = "4\n"
+
     def __init__(self,name):
         super().__init__(name)
         self.hillside = AudioSegment.from_file('/home/skippy/Sundries-Wiper/src/wheel_motors/wheel_motors/audio/hillside.mp3', format='mp3')
@@ -207,13 +212,13 @@ class ManualMode(Node):
                 GPIO.output(self.air_valve, GPIO.LOW)
 
             if input['dpad_x'] == -1:
-                self.arduino.write("1\n")
+                self.arduino.write(self.arm_enable.encode())
             if input['dpad_x'] == 1:
-                self.arduino.write("2\n")
+                self.arduino.write(self.arm_disable.encode())
             if input['select_button'] == 0:
-                self.arduino.write("3\n")
+                self.arduino.write(self.arm_down.encode())
             if input['start_button'] == 0:
-                self.arduino.write("4\n")
+                self.arduino.write(self.arm_up.encode())
 
 
 def main(args=None):
