@@ -215,9 +215,9 @@ class ManualMode(Node):
                 self.arduino.write(self.arm_enable.encode())
             if input['dpad_x'] == 1:
                 self.arduino.write(self.arm_disable.encode())
-            if input['select_button'] == 0:
+            if input['select_button'] == 1:
                 self.arduino.write(self.arm_down.encode())
-            if input['start_button'] == 0:
+            if input['start_button'] == 1:
                 self.arduino.write(self.arm_up.encode())
 
 
