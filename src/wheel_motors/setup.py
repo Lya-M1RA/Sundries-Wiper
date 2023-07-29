@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'manual_mode = wheel_motors.manual_mode:main',
+            'fixed_position = wheel_motors.fixed_position:main', 
         ],
     },
 )
