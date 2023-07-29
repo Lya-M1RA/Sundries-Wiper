@@ -190,12 +190,12 @@ class FixedPosition(Node):
 
             if self.state_enable[0] == True:
                 if input['dpad_x'] == -1:
-                    self.move_straight(0.3)
-                    sleep(10)
-                    self.turn(90)
-                    sleep(10)
-                    self.move_straight(0.3)
-                    sleep(10)
+                    self.move_straight(3)
+                    sleep(20)
+                    self.turn(180)
+                    sleep(20)
+                    self.move_straight(3)
+                    sleep(20)
                     self.arduino.write(self.arm_enable.encode())
                     self.arduino.write(self.arm_down.encode())
                     sleep(20)
@@ -205,9 +205,11 @@ class FixedPosition(Node):
                     sleep(1)
                     self.arduino.write(self.arm_up.encode())
                     sleep(20)
-                    GPIO.output(self.air_pump, GPIO.HIGH)
+                    self.arduino.write(self.arm_disable.encode())
+                    GPIO.output(self.air_valve, GPIO.HIGH)
                     sleep(1)
-                    GPIO.output(self.air_pump, GPIO.LOW)
+                    GPIO.output(self.air_valve, GPIO.LOW)
+
 
 def main(args=None):
     rclpy.init(args=args)
